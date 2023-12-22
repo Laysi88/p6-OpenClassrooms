@@ -3,6 +3,7 @@ const BestFamilyMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&ma
 const BestSciFiMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=Sci-Fi&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
 const BestThrillerMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=Thriller&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
 
+// Récupérer les données de l'API
 async function get(url) {
     try {
         const response = await fetch(url);
@@ -13,7 +14,7 @@ async function get(url) {
         throw err;
     }
 }
-
+// Récupérer les détails d'un film
 async function getMovieDetails(id) {
     try {
         const movieDetailsUrl = `http://127.0.0.1:8000/api/v1/titles/${id}`;
@@ -24,7 +25,7 @@ async function getMovieDetails(id) {
         throw error;
     }
 }
-
+// Créer les éléments HTML pour chaque film
 function createMovieElement(movieDetails) {
     const movieItem = document.createElement('div');
     movieItem.classList.add('bestMovieItem');
@@ -43,7 +44,7 @@ function createMovieElement(movieDetails) {
     movieItem.appendChild(imgDiv);
     return movieItem;
 }
-
+// Récupérer les 7 meilleurs films
 async function getBestMovies(url, containerId) {
     const movies = await get(url);
     const bestMovies = movies.results.slice(0, 7);
@@ -55,7 +56,7 @@ async function getBestMovies(url, containerId) {
         container.appendChild(movieElement);
     }
 
-    // Check if there are more movies on the next page
+    // Vérifiez si la page suivante existe et récupérez les films supplémentaires si nécessaire
     if (movies.next) {
         const moviesPage2 = await get(movies.next);
         const additionalMovies = moviesPage2.results.slice(0, 7 - bestMovies.length);
@@ -69,7 +70,7 @@ async function getBestMovies(url, containerId) {
 
     return bestMovies;
 }
-
+// Récupérer le meilleur film
 async function getBestMovie() {
     try {
         const movies = await get(BestMovie);
@@ -94,7 +95,7 @@ async function getBestMovie() {
         throw error;
     }
 }
-
+// Créer le modal
 function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movieRated, movieScore, movieDirector, movieActors, movieDuration, movieCountries, movieIncome, movieDescription) {
     const modal = document.getElementById('myModal');
     const modalImg = document.getElementById('modalImg');
@@ -134,7 +135,7 @@ function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movi
     modalDescription.textContent = "Résumé: " + movieDescription;
 
 }
-
+// Fermer le modal
 function closeModal() {
     const modal = document.getElementById('myModal');
     modal.style.display = 'none';
