@@ -14,68 +14,102 @@ async function get(url) {
     }
 }
 
-async function getBestMovie() {
-    const movies = await get(BestMovie);
-    const bestMovie = movies.results[0];
-    const bestMovieId = bestMovie.id;
-
-    const bestMovieTitleDiv = document.getElementById('bestMovieTitle');
-    bestMovieTitleDiv.textContent = bestMovie.title;
-    const bestMovieImgDiv = document.getElementById('bestMovieImg');
-    bestMovieImgDiv.src = bestMovie.image_url.replaceAll('268', '1072').replace('182', '728');
-
-    bestMovieImgDiv.addEventListener('click', function () {
-        renderModal(bestMovieId, bestMovie.title, bestMovie.image_url, bestMovie.genres, bestMovie.year, bestMovie.rated);
-    });
-
-    return bestMovie;
+async function getMovieDetails(id) {
+    try {
+        const movieDetailsUrl = `http://127.0.0.1:8000/api/v1/titles/${id}`;
+        const movieDetails = await get(movieDetailsUrl);
+        return movieDetails;
+    } catch (error) {
+        console.error(`Erreur lors de la récupération des détails du film avec ID ${id}:`, error);
+        throw error;
+    }
 }
 
-// Fonction générique pour récupérer les meilleurs films
-async function getBestMovies(url) {
+function createMovieElement(movieDetails) {
+    const movieItem = document.createElement('div');
+    movieItem.classList.add('bestMovieItem');
+
+    const imgDiv = document.createElement('img');
+    imgDiv.classList.add('bestMovieImg');
+    imgDiv.src = movieDetails.image_url;
+    imgDiv.alt = movieDetails.title;
+
+    imgDiv.addEventListener('click', function () {
+        renderModal(movieDetails.id, movieDetails.title, movieDetails.image_url, movieDetails.genres, movieDetails.year,
+            movieDetails.rated, movieDetails.imdb_score, movieDetails.directors, movieDetails.actors, movieDetails.duration,
+            movieDetails.countries, movieDetails.worldwide_gross_income, movieDetails.description);
+    });
+
+    movieItem.appendChild(imgDiv);
+    return movieItem;
+}
+
+async function getBestMovies(url, containerId) {
     const movies = await get(url);
-    let movies2 = await get(url + '&page=2');
-    movies.results = movies.results.concat(movies2.results);
     const bestMovies = movies.results.slice(0, 7);
-
-    const containerId = url === BestMovie
-        ? 'sevenBestMoviesContainer'
-        : url === BestFamilyMovie
-            ? 'sevenBestFamilyMoviesContainer'
-            : url === BestSciFiMovie
-                ? 'sevenBestSciFiMoviesContainer'
-                : url === BestThrillerMovie
-                    ? 'sevenBestThrillerMoviesContainer'
-                    : '';
-
     const container = document.getElementById(containerId);
 
-    bestMovies.forEach(movie => {
-        const movieItem = document.createElement('div');
-        movieItem.classList.add('bestMovieItem');
+    for (const movie of bestMovies) {
+        const movieDetails = await getMovieDetails(movie.id);
+        const movieElement = createMovieElement(movieDetails);
+        container.appendChild(movieElement);
+    }
 
-        const imgDiv = document.createElement('img');
-        imgDiv.classList.add('bestMovieImg');
-        imgDiv.src = movie.image_url;
-        imgDiv.alt = movie.title;
-        imgDiv.addEventListener('click', function () {
-            renderModal(movie.id, movie.title, movie.image_url, movie.genres, movie.year, movie.rated);
-        });
-        movieItem.appendChild(imgDiv);
-        container.appendChild(movieItem);
+    // Check if there are more movies on the next page
+    if (movies.next) {
+        const moviesPage2 = await get(movies.next);
+        const additionalMovies = moviesPage2.results.slice(0, 7 - bestMovies.length);
 
-    });
+        for (const movie of additionalMovies) {
+            const movieDetails = await getMovieDetails(movie.id);
+            const movieElement = createMovieElement(movieDetails);
+            container.appendChild(movieElement);
+        }
+    }
 
     return bestMovies;
 }
 
-function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movieRated) {
+async function getBestMovie() {
+    try {
+        const movies = await get(BestMovie);
+        const bestMovie = movies.results[0];
+        const bestMovieDetails = await getMovieDetails(bestMovie.id);
+
+        const bestMovieTitleDiv = document.getElementById('bestMovieTitle');
+        bestMovieTitleDiv.textContent = bestMovieDetails.title;
+
+        const bestMovieImgDiv = document.getElementById('bestMovieImg');
+        bestMovieImgDiv.src = bestMovieDetails.image_url.replaceAll('268', '1072').replace('182', '728');
+
+        bestMovieImgDiv.addEventListener('click', function () {
+            renderModal(bestMovieDetails.id, bestMovieDetails.title, bestMovieDetails.image_url, bestMovieDetails.genres, bestMovieDetails.year,
+                bestMovieDetails.rated, bestMovieDetails.imdb_score, bestMovieDetails.directors, bestMovieDetails.actors, bestMovieDetails.duration,
+                bestMovieDetails.countries, bestMovieDetails.worldwide_gross_income, bestMovieDetails.description);
+        });
+
+        return bestMovieDetails;
+    } catch (error) {
+        console.error("Erreur lors de la récupération du meilleur film :", error);
+        throw error;
+    }
+}
+
+function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movieRated, movieScore, movieDirector, movieActors, movieDuration, movieCountries, movieIncome, movieDescription) {
     const modal = document.getElementById('myModal');
     const modalImg = document.getElementById('modalImg');
     const modalTitle = document.getElementById('modalTitle');
     const modalGenre = document.getElementById('modalGenre');
     const modalDate = document.getElementById('modalDate');
     const modalRated = document.getElementById('modalRated');
+    const modalScore = document.getElementById('modalScore');
+    const modalDirector = document.getElementById('modalDirector');
+    const modalActors = document.getElementById('modalActors');
+    const modalDuration = document.getElementById('modalDuration');
+    const modalCountries = document.getElementById('modalCountries');
+    const modalIncome = document.getElementById('modalIncome');
+    const modalDescription = document.getElementById('modalDescription');
+
 
     // Mettez à jour le contenu du modal avec les informations spécifiques
     modal.style.display = 'block';
@@ -89,6 +123,15 @@ function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movi
     }
     modalDate.textContent = "Date de sortie: " + movieDate;
     modalRated.textContent = "Classification: " + movieRated;
+    modalScore.textContent = "Score IMDB: " + movieScore;
+    modalDirector.textContent = "Réalisateur(s): " + movieDirector.join(', ');
+    modalActors.textContent = "Acteur(s): " + movieActors.join(', ');
+    modalDuration.textContent = "Durée: " + movieDuration + " minutes";
+    modalCountries.textContent = "Pays: " + movieCountries.join(', ');
+    modalIncome.textContent = movieIncome
+        ? "Revenus: " + movieIncome.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+        : "Revenus non spécifiés";
+    modalDescription.textContent = "Résumé: " + movieDescription;
 
 }
 
@@ -101,18 +144,11 @@ function closeModal() {
 // Appel des fonctions au chargement de la page
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const bestMovie = await getBestMovie();
-        console.log("Meilleur film :", bestMovie);
-
-        // Appeler la fonction pour récupérer les sept meilleurs films
-        const sevenBestMovies = await getBestMovies(BestMovie);
-        console.log("Sept meilleurs films :", sevenBestMovies);
-        const sevenBestFamilyMovies = await getBestMovies(BestFamilyMovie);
-        console.log("Sept meilleurs films de fantasy :", sevenBestFamilyMovies);
-        const sevenBestSciFiMovies = await getBestMovies(BestSciFiMovie);
-        console.log("Sept meilleurs films de science-fiction :", sevenBestSciFiMovies);
-        const sevenBestThrillerMovies = await getBestMovies(BestThrillerMovie);
-        console.log("Sept meilleurs films de thriller :", sevenBestThrillerMovies);
+        await getBestMovie();
+        await getBestMovies(BestMovie, 'sevenBestMoviesContainer');
+        await getBestMovies(BestFamilyMovie, 'sevenBestFamilyMoviesContainer');
+        await getBestMovies(BestSciFiMovie, 'sevenBestSciFiMoviesContainer');
+        await getBestMovies(BestThrillerMovie, 'sevenBestThrillerMoviesContainer');
     } catch (error) {
         console.error("Erreur :", error);
     }
