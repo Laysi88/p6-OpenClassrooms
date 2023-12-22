@@ -1,5 +1,7 @@
 const BestMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
-
+const BestFamilyMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=Family&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
+const BestSciFiMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=Sci-Fi&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
+const BestThrillerMovie = "http://127.0.0.1:8000/api/v1/titles/?year=&min_year=&max_year=&imdb_score=&imdb_score_min=&imdb_score_max=&title=&title_contains=&genre=Thriller&genre_contains=&sort_by=-imdb_score&director=&director_contains=&writer=&writer_contains=&actor=&actor_contains=&country=&country_contains=&lang=&lang_contains=&company=&company_contains=&rating=&rating_contains=";
 
 async function get(url) {
     try {
@@ -36,10 +38,15 @@ async function getBestMovies(url) {
     movies.results = movies.results.concat(movies2.results);
     const bestMovies = movies.results.slice(0, 7);
 
-    const containerId = url === BestMovie ? 'sevenBestMoviesContainer' : '';
-    //url === BestMovie2 ? 'sevenBestMoviesContainer2' :
-    //url === BestMovie3 ? 'sevenBestMoviesContainer3' :
-    //url === BestMovie4 ? 'sevenBestMoviesContainer4' : '';
+    const containerId = url === BestMovie
+        ? 'sevenBestMoviesContainer'
+        : url === BestFamilyMovie
+            ? 'sevenBestFamilyMoviesContainer'
+            : url === BestSciFiMovie
+                ? 'sevenBestSciFiMoviesContainer'
+                : url === BestThrillerMovie
+                    ? 'sevenBestThrillerMoviesContainer'
+                    : '';
 
     const container = document.getElementById(containerId);
 
@@ -49,7 +56,7 @@ async function getBestMovies(url) {
 
         const imgDiv = document.createElement('img');
         imgDiv.classList.add('bestMovieImg');
-        imgDiv.src = movie.image_url.replaceAll('268', '1072').replace('182', '728');
+        imgDiv.src = movie.image_url;
         imgDiv.alt = movie.title;
         imgDiv.addEventListener('click', function () {
             renderModal(movie.id, movie.title, movie.image_url);
@@ -91,6 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Appeler la fonction pour récupérer les sept meilleurs films
         const sevenBestMovies = await getBestMovies(BestMovie);
         console.log("Sept meilleurs films :", sevenBestMovies);
+        const sevenBestFamilyMovies = await getBestMovies(BestFamilyMovie);
+        console.log("Sept meilleurs films de fantasy :", sevenBestFamilyMovies);
+        const sevenBestSciFiMovies = await getBestMovies(BestSciFiMovie);
+        console.log("Sept meilleurs films de science-fiction :", sevenBestSciFiMovies);
+        const sevenBestThrillerMovies = await getBestMovies(BestThrillerMovie);
+        console.log("Sept meilleurs films de thriller :", sevenBestThrillerMovies);
     } catch (error) {
         console.error("Erreur :", error);
     }
