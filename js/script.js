@@ -25,7 +25,7 @@ async function getBestMovie() {
     bestMovieImgDiv.src = bestMovie.image_url.replaceAll('268', '1072').replace('182', '728');
 
     bestMovieImgDiv.addEventListener('click', function () {
-        renderModal(bestMovieId, bestMovie.title, bestMovie.image_url);
+        renderModal(bestMovieId, bestMovie.title, bestMovie.image_url, bestMovie.genres, bestMovie.year, bestMovie.rated);
     });
 
     return bestMovie;
@@ -59,28 +59,37 @@ async function getBestMovies(url) {
         imgDiv.src = movie.image_url;
         imgDiv.alt = movie.title;
         imgDiv.addEventListener('click', function () {
-            renderModal(movie.id, movie.title, movie.image_url);
+            renderModal(movie.id, movie.title, movie.image_url, movie.genres, movie.year, movie.rated);
         });
         movieItem.appendChild(imgDiv);
         container.appendChild(movieItem);
+
     });
 
     return bestMovies;
 }
 
-//creation d'un modal
-function renderModal(movieId, movieTitle, movieImg) {
+function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movieRated) {
     const modal = document.getElementById('myModal');
     const modalImg = document.getElementById('modalImg');
     const modalTitle = document.getElementById('modalTitle');
+    const modalGenre = document.getElementById('modalGenre');
+    const modalDate = document.getElementById('modalDate');
+    const modalRated = document.getElementById('modalRated');
 
     // Mettez à jour le contenu du modal avec les informations spécifiques
     modal.style.display = 'block';
     modalImg.src = movieImg;
     modalImg.alt = movieTitle;
     modalTitle.textContent = movieTitle;
+    if (movieGenres && movieGenres.length > 0) {
+        modalGenre.textContent = "Genres: " + movieGenres.join(', ');
+    } else {
+        modalGenre.textContent = "Genres non spécifiés";
+    }
+    modalDate.textContent = "Date de sortie: " + movieDate;
+    modalRated.textContent = "Classification: " + movieRated;
 
-    // Ajoutez d'autres actions ou données spécifiques au film si nécessaire
 }
 
 function closeModal() {
