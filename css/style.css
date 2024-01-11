@@ -109,20 +109,6 @@ img {
     text-shadow: 5px 5px 10px red;
 }
 
-.container {
-    box-shadow: 0 4px 8px #ffcc00;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 20px;
-}
-
 .modal {
     display: none;
     position: fixed;
@@ -149,4 +135,41 @@ img {
     font-size: 30px;
     color: #ffcc00;
     cursor: pointer;
+}
+
+.grid-container {
+    display: flex;
+    overflow-x: scroll;
+    width: 100%;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.grid-container::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+
+
+.bestMovieItem {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    margin-right: 50px;
+
+}
+
+.container {
+    box-shadow: 0 4px 8px #ffcc00;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    overflow: hidden;
 }

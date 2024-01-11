@@ -28,7 +28,7 @@ async function getMovieDetails(id) {
 // Créer les éléments HTML pour chaque film
 function createMovieElement(movieDetails) {
     const movieItem = document.createElement('div');
-    movieItem.classList.add('bestMovieItem');
+    movieItem.classList.add('bestMovieItem'); // Ajoutez la classe pour le carrousel
 
     const imgDiv = document.createElement('img');
     imgDiv.classList.add('bestMovieImg');
@@ -44,32 +44,46 @@ function createMovieElement(movieDetails) {
     movieItem.appendChild(imgDiv);
     return movieItem;
 }
-// Récupérer les 7 meilleurs films
-async function getBestMovies(url, containerId) {
-    const movies = await get(url);
-    const bestMovies = movies.results.slice(0, 7);
-    const container = document.getElementById(containerId);
+async function getBestMoviesWithCarousel(url, containerId) {
+    try {
+        const movies = await get(url);
+        const bestMovies = movies.results.slice(0, 7);
+        const container = document.getElementById(containerId);
 
-    for (const movie of bestMovies) {
-        const movieDetails = await getMovieDetails(movie.id);
-        const movieElement = createMovieElement(movieDetails);
-        container.appendChild(movieElement);
-    }
+        // Créer un conteneur pour le carousel
+        const carouselContainer = document.createElement('div');
+        carouselContainer.classList.add('carousel-container');
 
-    // Vérifiez si la page suivante existe et récupérez les films supplémentaires si nécessaire
-    if (movies.next) {
-        const moviesPage2 = await get(movies.next);
-        const additionalMovies = moviesPage2.results.slice(0, 7 - bestMovies.length);
+        // Ajouter les images au carousel
+        for (const movie of bestMovies) {
 
-        for (const movie of additionalMovies) {
             const movieDetails = await getMovieDetails(movie.id);
             const movieElement = createMovieElement(movieDetails);
-            container.appendChild(movieElement);
+            carouselContainer.appendChild(movieElement);
         }
-    }
+        if (movies.next) {
+            const moviesPage2 = await get(movies.next);
+            const additionalMovies = moviesPage2.results.slice(0, 7 - bestMovies.length);
+            for (const movie of additionalMovies) {
+                const movieDetails = await getMovieDetails(movie.id);
+                const movieElement = createMovieElement(movieDetails);
+                carouselContainer.appendChild(movieElement);
+            }
+        }
 
-    return bestMovies;
+        container.appendChild(carouselContainer);
+
+        return bestMovies;
+    } catch (error) {
+        console.error("Erreur :", error);
+    }
 }
+function scrollCarousel(carouselContainer, direction) {
+    const itemWidth = carouselContainer.offsetWidth / 2; // Ajustez le déplacement selon votre préférence
+    const scrollAmount = itemWidth * direction;
+    carouselContainer.scrollLeft += scrollAmount;
+}
+
 // Récupérer le meilleur film
 async function getBestMovie() {
     try {
@@ -142,15 +156,16 @@ function closeModal() {
 }
 
 
-// Appel des fonctions au chargement de la page
+// Appel de la fonction au chargement de la page
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         await getBestMovie();
-        await getBestMovies(BestMovie, 'sevenBestMoviesContainer');
-        await getBestMovies(BestFamilyMovie, 'sevenBestFamilyMoviesContainer');
-        await getBestMovies(BestSciFiMovie, 'sevenBestSciFiMoviesContainer');
-        await getBestMovies(BestThrillerMovie, 'sevenBestThrillerMoviesContainer');
+        await getBestMoviesWithCarousel(BestMovie, 'sevenBestMoviesContainer');
+        await getBestMoviesWithCarousel(BestFamilyMovie, 'sevenBestFamilyMoviesContainer');
+        await getBestMoviesWithCarousel(BestSciFiMovie, 'sevenBestSciFiMoviesContainer');
+        await getBestMoviesWithCarousel(BestThrillerMovie, 'sevenBestThrillerMoviesContainer');
     } catch (error) {
         console.error("Erreur :", error);
     }
 });
+
