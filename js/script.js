@@ -28,7 +28,7 @@ async function getMovieDetails(id) {
 // Créer les éléments HTML pour chaque film
 function createMovieElement(movieDetails) {
     const movieItem = document.createElement('div');
-    movieItem.classList.add('bestMovieItem'); // Ajoutez la classe pour le carrousel
+    movieItem.classList.add('bestMovieItem');
 
     const imgDiv = document.createElement('img');
     imgDiv.classList.add('bestMovieImg');
@@ -54,13 +54,25 @@ async function getBestMoviesWithCarousel(url, containerId) {
         const carouselContainer = document.createElement('div');
         carouselContainer.classList.add('carousel-container');
 
+        // Ajouter le bouton précédent
+        const prevButton = document.createElement('div');
+        prevButton.classList.add('carousel-button', 'left');
+        const prevArrow = document.createElement('img');
+        prevArrow.src = '/img/left-arrow.svg';
+        prevArrow.alt = 'Previous';
+        prevButton.appendChild(prevArrow);
+        prevButton.addEventListener('click', () => {
+            scrollCarousel(carouselContainer, -1);
+        });
+        container.appendChild(prevButton);
+
         // Ajouter les images au carousel
         for (const movie of bestMovies) {
-
             const movieDetails = await getMovieDetails(movie.id);
             const movieElement = createMovieElement(movieDetails);
             carouselContainer.appendChild(movieElement);
         }
+        // Ajouter les images de la page suivante si elle existe
         if (movies.next) {
             const moviesPage2 = await get(movies.next);
             const additionalMovies = moviesPage2.results.slice(0, 7 - bestMovies.length);
@@ -73,13 +85,27 @@ async function getBestMoviesWithCarousel(url, containerId) {
 
         container.appendChild(carouselContainer);
 
+        // Ajouter le bouton suivant
+        const nextButton = document.createElement('div');
+        nextButton.classList.add('carousel-button', 'right');
+        const nextArrow = document.createElement('img');
+        nextArrow.src = '/img/right-arrow.svg';
+        nextArrow.alt = 'Next';
+        nextButton.appendChild(nextArrow);
+        nextButton.addEventListener('click', () => {
+            scrollCarousel(carouselContainer, 1);
+        });
+
+        container.appendChild(nextButton);
+
         return bestMovies;
     } catch (error) {
         console.error("Erreur :", error);
     }
 }
 function scrollCarousel(carouselContainer, direction) {
-    const itemWidth = carouselContainer.offsetWidth / 2; // Ajustez le déplacement selon votre préférence
+    const items = carouselContainer.querySelectorAll('.bestMovieItem');
+    const itemWidth = items.length > 0 ? items[0].clientWidth : 0;
     const scrollAmount = itemWidth * direction;
     carouselContainer.scrollLeft += scrollAmount;
 }
@@ -109,6 +135,9 @@ async function getBestMovie() {
         throw error;
     }
 }
+
+
+
 // Créer le modal
 function renderModal(movieId, movieTitle, movieImg, movieGenres, movieDate, movieRated, movieScore, movieDirector, movieActors, movieDuration, movieCountries, movieIncome, movieDescription) {
     const modal = document.getElementById('myModal');

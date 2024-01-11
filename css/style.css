@@ -154,8 +154,22 @@ img {
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative;
+    overflow: hidden;
 }
 
+
+.carousel-button {
+    background-color: #333;
+    margin-top: 135px;
+
+}
+
+.carousel-button.left {
+    margin-right: 25px;
+}
 
 
 .bestMovieItem {
