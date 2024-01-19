@@ -151,6 +151,7 @@ img {
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    position: relative;
 }
 
 .grid-container::-webkit-scrollbar {
@@ -175,7 +176,7 @@ img {
 }
 
 .carousel-button.left {
-    margin-right: 25px;
+    margin-right: 18px;
 }
 
 
@@ -183,6 +184,15 @@ img {
     flex: 0 0 auto;
     scroll-snap-align: start;
     margin-right: 50px;
+}
+
+.bestMovieImg {
+    margin-left: 3px;
+    margin-top: 3px;
+}
+
+.bestMovieImg:hover {
+    box-shadow: #ffcc00 0px 0px 10px;
 
 }
 
