@@ -52,6 +52,7 @@ img {
     text-shadow: 5px 5px 10px red;
 }
 
+
 .header__title {
     font-size: 60px;
     text-align: center;
@@ -64,6 +65,12 @@ img {
 .header__category {
     margin-right: 30px;
     display: flex;
+}
+
+.header__category:hover {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+
 }
 
 #bestMovieTitle {
