@@ -54,6 +54,13 @@ async function getBestMoviesWithCarousel(url, containerId) {
         const carouselContainer = document.createElement('div');
         carouselContainer.classList.add('carousel-container');
 
+        // Cloner les éléments pour créer l'effet de boucle
+        const clonedMovies = bestMovies.map(movie => ({ ...movie }));
+        for (const movie of clonedMovies) {
+            const movieDetails = await getMovieDetails(movie.id);
+            const movieElement = createMovieElement(movieDetails);
+            carouselContainer.appendChild(movieElement);
+        }
         // Ajouter le bouton précédent
         const prevButton = document.createElement('div');
         prevButton.classList.add('carousel-button', 'left');
@@ -66,6 +73,8 @@ async function getBestMoviesWithCarousel(url, containerId) {
         });
         container.appendChild(prevButton);
 
+
+        container.appendChild(carouselContainer);
         // Ajouter les images au carousel
         for (const movie of bestMovies) {
             const movieDetails = await getMovieDetails(movie.id);
@@ -106,8 +115,22 @@ async function getBestMoviesWithCarousel(url, containerId) {
 function scrollCarousel(carouselContainer, direction) {
     const items = carouselContainer.querySelectorAll('.bestMovieItem');
     const itemWidth = items.length > 0 ? items[0].clientWidth : 0;
-    const scrollAmount = itemWidth * direction;
-    carouselContainer.scrollLeft += scrollAmount;
+    const totalWidth = itemWidth * items.length;
+
+    let newScrollLeft = carouselContainer.scrollLeft + direction * itemWidth;
+
+    // Si le nouveau défilement dépasse la fin du carrousel, revenir au début
+    if (newScrollLeft > totalWidth) {
+        newScrollLeft = 0;
+    }
+
+    // Si le nouveau défilement est avant le début du carrousel, aller à la fin
+    if (newScrollLeft < 0) {
+        newScrollLeft = totalWidth;
+    }
+
+    // Appliquer le nouveau défilement
+    carouselContainer.scrollLeft = newScrollLeft;
 }
 
 // Récupérer le meilleur film
