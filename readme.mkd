@@ -1,0 +1,17 @@
+# Projet 6 Openclassrooms : Just Steam It #
+
+
+## Prérequis: ## 
+
+- IDE (exemple:VSCODE ou Pycharm ou tout autre IDE de votre choix)
+- Python: disponible sur https://www.python.org/
+
+## Installation: ##
+
+- Installer l'API en suivant les indications:  
+https://github.com/OpenClassrooms-Student-Center/OCMovies-API-EN-FR
+- Clonez ce repository:  
+```git clone https://github.com/Laysi88/P4 ```
+
+## Utilisation:  ##
+Ouvrez le fichier index.html dans un nouvel onglet de votrenavigateur.
