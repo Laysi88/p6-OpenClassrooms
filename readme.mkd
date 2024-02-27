@@ -14,4 +14,4 @@ https://github.com/OpenClassrooms-Student-Center/OCMovies-API-EN-FR
 ```git clone https://github.com/Laysi88/P4 ```
 
 ## Utilisation:  ##
-Ouvrez le fichier index.html dans un nouvel onglet de votrenavigateur.
+Ouvrez le fichier index.html dans un nouvel onglet de votre navigateur.
